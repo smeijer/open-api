@@ -66,10 +66,7 @@ export function OperationExample({ operation, definitions }) {
             })),
           );
 
-          // add delay to show more calm spinner during POC demo
-          setTimeout(() => {
-            setState({ status: 'success', data });
-          }, 500);
+          setState({ status: 'success', data });
         } catch (e) {
           console.error('error during request', e);
           setState({ ...state, status: 'error', error: e.message });
