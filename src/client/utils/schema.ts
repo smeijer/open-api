@@ -125,8 +125,10 @@ export function getOperations(data) {
             ? data.servers[0].url
             : `${data.schemes[0]}://${data.host}${data.basePath}`;
 
+          const id = operation.operationId as string;
+
           return {
-            id: `${groupName}/${operation.operationId}`,
+            id: id.startsWith(groupName + '/') ? id : `${groupName}/${id}`,
             group: groups[groupName],
             baseURL,
             path,
