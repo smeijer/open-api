@@ -1,0 +1,34 @@
+body {
+  overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #adb5bd;
+  border-radius: 4px;
+}
+
+code.theme-light[class*='language-'],
+pre.theme-light[class*='language-'] {
+  color: #8292a2 !important;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.05) !important;
+  border-radius: 0 !important;
+}
+
+pre.theme-light[class*='language-'] .token.operator,
+pre.theme-light[class*='language-'] .token.entity,
+pre.theme-light[class*='language-'] .token.url,
+pre.theme-light[class*='language-'] .language-css .token.string,
+pre.theme-light[class*='language-'] .style .token.string,
+pre.theme-light[class*='language-'] .token.variable,
+pre.theme-light[class*='language-'] .token.punctuation {
+  color: #8292a2 !important;
+}
+
+pre.theme-light.language-yaml .token.atrule {
+  color: #66d9ef !important;
+}

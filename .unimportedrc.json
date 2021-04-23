@@ -1,0 +1,16 @@
+{
+  "ignoreUnresolved": [],
+  "ignoreUnimported": [],
+  "ignoreUnused": ["@next/bundle-analyzer"],
+  "entry": ["src/pages/**/*.{js,ts,tsx}"],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/*.stories.{js,jsx,ts,tsx}",
+    "**/*.tests.{js,jsx,ts,tsx}",
+    "**/*.test.{js,jsx,ts,tsx}",
+    "**/*.spec.{js,jsx,ts,tsx}",
+    "**/tests/**",
+    "**/__tests__/**",
+    "**/*.d.ts"
+  ]
+}
