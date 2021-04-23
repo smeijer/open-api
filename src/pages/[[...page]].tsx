@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Waypoint } from 'react-waypoint';
 
 import { BaseUrl } from '~/client/components/base-url';
@@ -14,7 +14,7 @@ import {
   groupOperationsByGroupName,
 } from '~/client/utils/schema';
 
-import data from '../data.json';
+import petstore from '../../fixtures/petstore.json';
 
 let LAST_SCROLL = Date.now();
 
@@ -24,18 +24,49 @@ if (typeof window !== 'undefined') {
   });
 }
 
+let SPEC_URL;
+
 function Home() {
   const router = useRouter();
-  const operations = useMemo(() => getOperations(data), []);
+  const [data, setData] = useState<typeof petstore>();
+  const operations = useMemo(() => getOperations(data), [data]);
   const grouped = groupOperationsByGroupName(operations);
 
   const page = Array.isArray(router.query.page)
     ? router.query.page.join('/')
     : router.query.page;
 
+  // cheap persistence across url changes
+  if (!SPEC_URL) {
+    SPEC_URL = Array.isArray(router.query.url)
+      ? router.query.url[0]
+      : router.query.url;
+  }
+
   const selectedOperation = page
     ? operations.find((op) => op.id === page)
     : operations[0];
+
+  // load swagger data
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+
+    if (!SPEC_URL) {
+      // By setting the fallback data here instead of as initial value to
+      // useState, we prevent a short flash of petstore in case the user
+      // provided a custom url
+      setData(petstore);
+      return;
+    }
+
+    fetch(SPEC_URL)
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      // fall back to local data
+      .catch(() => setData(petstore));
+  }, [router.isReady, SPEC_URL]);
 
   // scroll active page into view, should this only run on mount?
   useEffect(() => {
@@ -44,11 +75,35 @@ function Home() {
     }
 
     // We don't want user scroll actions to trigger a scroll to anchor
-    const invokedByScroll = Date.now() - LAST_SCROLL < 100;
+    const invokedByScroll = Date.now() - LAST_SCROLL < 500;
     if (!invokedByScroll) {
       document.getElementById(page)?.scrollIntoView();
     }
   }, [page, router.isReady]);
+
+  if (!data) {
+    // petstore fallback loads almost instantly, showing a loading message would
+    // do more harm than good. Use `spin-delay` in production.
+    return (
+      <div className="w-screen h-screen flex justify-center items-center">
+        <p className="animate-pulse text-center">
+          {SPEC_URL ? (
+            <>
+              fetching <br />
+              {SPEC_URL}
+            </>
+          ) : (
+            ''
+          )}
+        </p>
+      </div>
+    );
+  }
+
+  // both standards work with json-schema pointers, it's also possible
+  // to provide the whole 'data' object, and handle pointers properly, but
+  // this works for the time being.
+  const definitions = data['definitions'] || data['components'];
 
   return (
     <>
@@ -69,9 +124,7 @@ function Home() {
             />
 
             <div className="space-y-4 sticky top-0 py-24 self-start">
-              <BaseUrl
-                url={`${data.schemes[0]}://${data.host}${data.basePath}`}
-              />
+              <BaseUrl url={operations[0].baseURL} />
             </div>
           </div>
         </section>
@@ -97,13 +150,13 @@ function Home() {
                     {group.operations.map((operation) => (
                       <div key={operation.id} className="w-full flex space-x-2">
                         <div
-                          className={`w-12 text-right uppercase text-${getColor(
+                          className={`flex-none w-12 text-right uppercase text-${getColor(
                             operation,
                           )}-400`}
                         >
                           {operation.method}
                         </div>
-                        <div>{operation.path}</div>
+                        <div className="truncate">{operation.path}</div>
                       </div>
                     ))}
                   </div>
@@ -129,14 +182,14 @@ function Home() {
                   <div className="py-24">
                     <OperationDetails
                       operation={operation}
-                      definitions={data.definitions}
+                      definitions={definitions}
                     />
                   </div>
 
                   <div className="space-y-4 sticky top-0 py-24 self-start">
                     <OperationExample
                       operation={operation}
-                      definitions={data.definitions}
+                      definitions={definitions}
                     />
                   </div>
                 </section>
@@ -149,5 +202,4 @@ function Home() {
   );
 }
 
-// TODO: move base url up to the top of the page, only needed once
 export default Home;

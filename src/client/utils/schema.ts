@@ -48,16 +48,24 @@ export function getExampleObject(
   const obj = {};
 
   if (!refObject?.items?.$ref && !refObject?.$ref) {
-    return {};
+    return obj;
   }
 
-  const name = (refObject.items?.$ref || refObject.$ref)
+  const pointer = refObject.items?.$ref || refObject.$ref;
+
+  // skip '#/components' || '#/definitions'
+  const definition = pointer
     .split('/')
-    .slice(-1)[0];
+    .slice(2)
+    .reduce((value, key) => value[key], definitions);
 
-  const definition = definitions[name];
+  if (!definition.properties) {
+    return obj;
+  }
 
-  for (const [key, property] of Object.entries(definition.properties)) {
+  for (const [key, property] of Object.entries<Record<string, any>>(
+    definition.properties,
+  )) {
     if (typeof property === 'boolean') {
       obj[key] = property;
     } else if ('example' in property) {
@@ -92,6 +100,10 @@ const methodToActionMap = {
  * Converts the swagger definition to a flat list of operations
  */
 export function getOperations(data) {
+  if (!data) {
+    return [];
+  }
+
   const groups = {};
 
   const operations = Object.keys(data.paths)
@@ -108,16 +120,35 @@ export function getOperations(data) {
             groups[groupName].operations = [];
           }
 
+          // openapi v3 defines urls in 'servers', swagger does not
+          const baseURL = Array.isArray(data.servers)
+            ? data.servers[0].url
+            : `${data.schemes[0]}://${data.host}${data.basePath}`;
+
           return {
             id: `${groupName}/${operation.operationId}`,
             group: groups[groupName],
-            baseURL: `${data.schemes[0]}://${data.host}${data.basePath}`,
+            baseURL,
             path,
             method,
             keywords: methodToActionMap[method],
+            ...operation,
+
             // add some explicitly for typescript inference
             deprecated: operation.deprecated,
-            ...operation,
+
+            // swagger 2 vs openapi 3
+            parameters:
+              (operation.requestBody
+                ? [
+                    {
+                      in: 'body',
+                      ...(operation.requestBody as any)?.content[
+                        'application/json'
+                      ],
+                    },
+                  ]
+                : operation.parameters) || [],
           };
         },
       ),

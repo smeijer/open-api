@@ -12,7 +12,8 @@ export function createCodeExample({
   definitions,
 }): { object: Record<string, unknown>; javascript: string } {
   const bodyParam = operation.parameters.find((param) => param.in === 'body');
-  const object = getExampleObject(bodyParam?.schema, definitions);
+  const object =
+    bodyParam?.example || getExampleObject(bodyParam?.schema, definitions);
   const url = `${operation.baseURL}${operation.path}`;
   const method = operation.method.toUpperCase();
 

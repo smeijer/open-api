@@ -13,7 +13,7 @@ export function SectionStart({ title, subtitle = null, description }) {
       <div
         className="font-light pb-4"
         dangerouslySetInnerHTML={{
-          __html: md.render(description),
+          __html: md.render(description || ''),
         }}
       />
     </div>

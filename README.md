@@ -4,6 +4,34 @@
 
 https://open-api.meijer.ws/
 
+# Functionality
+
+## Search
+
+It's possible to search trough endpoints using the search field on the left. Typing there, will filter the items shown in the sidebar.
+
+By pressing `/`, the search will get focus, and pushing `escape`, results in resetting the current search state.
+
+## Request simulations
+
+Every operation has a "response simulator". This gray box has a small "play icon" on the top right. Click it to trigger a request to our backend.
+
+Depending on the request, a payload might be send to the server. The server will then modify that payload, and return it as fake response. If no payload has been sent, we'll send a `{ ok: true }` response.
+
+## Loading Custom Specs
+
+It's possible to provide your own spec. By default, the swagger petstore is loaded. If you provide a `url` parameter, your spec will be used.
+
+Example:
+
+```
+https://open-api.meijer.ws?url=https://api.apis.guru/v2/specs/github.com/1.1.4/openapi.json
+```
+
+Please note that the GitHub spec is HUGE (3.38 MB & 693 operations). This POC renders all data on a single page, and doesn't use virtualization. Rendering all 693 operations in a single page, might result in reduced browser performance.
+
+In a production app, this MUST get optimized. The easy way would be to break up all pages to separate pages. But that doesn't look as nice (for a POC).
+
 # Choices Made
 
 ## Sorting / Grouping
@@ -45,3 +73,7 @@ Although we did mention it briefly on Discord, I haven't implemented tests, as I
 - a few assertions to select important elements, like headings, using `testing-library`. This way we ensure that certain elements are present, and accessible.
 
 More advanced tests would assert that the url updates while scrolling, and that the correct item is selected in the sidebar. But then again, this kind of tests are tricky to write and take some time. While that functionality is nice, it's not crucial.
+
+## data.json
+
+The task description mentioned that it should work with any Open API Spec based URL. I've downloaded the pet store example, and stored it under `src/data.json`. That file is read to generate the page. In a real world app, it's trivial to switch out `data.json` with a fetch.

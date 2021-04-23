@@ -1,12 +1,18 @@
 import { Parameters } from '~/client/components/parameters';
 import { Responses } from '~/client/components/responses';
 
-function getDefinition(refObject, definitions) {
-  if (!refObject?.$ref) {
+function getDefinition(schema, definitions) {
+  // openapi v3
+  if (schema?.properties) {
+    return schema;
+  }
+
+  // swagger v2
+  if (!schema?.$ref) {
     return null;
   }
 
-  const name = refObject.$ref.split('/').slice(-1)[0];
+  const name = schema.$ref.split('/').slice(-1)[0];
   return definitions[name];
 }
 

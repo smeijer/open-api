@@ -1,4 +1,8 @@
+import MarkdownIT from 'markdown-it';
+
 import { getPropertyType } from '~/client/utils/schema';
+
+const md = new MarkdownIT();
 
 export function Parameters({ schema }) {
   if (!schema?.properties || Object.keys(schema.properties).length === 0) {
@@ -25,7 +29,11 @@ export function Parameters({ schema }) {
             </div>
           </div>
           {property.description ? (
-            <p>{property.description}</p>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: md.render(property.description),
+              }}
+            />
           ) : (
             <p className="text-xs text-gray-300">No description available</p>
           )}
