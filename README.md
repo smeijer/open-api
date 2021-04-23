@@ -73,7 +73,3 @@ Although we did mention it briefly on Discord, I haven't implemented tests, as I
 - a few assertions to select important elements, like headings, using `testing-library`. This way we ensure that certain elements are present, and accessible.
 
 More advanced tests would assert that the url updates while scrolling, and that the correct item is selected in the sidebar. But then again, this kind of tests are tricky to write and take some time. While that functionality is nice, it's not crucial.
-
-## data.json
-
-The task description mentioned that it should work with any Open API Spec based URL. I've downloaded the pet store example, and stored it under `src/data.json`. That file is read to generate the page. In a real world app, it's trivial to switch out `data.json` with a fetch.
