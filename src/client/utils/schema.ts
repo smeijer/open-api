@@ -114,7 +114,9 @@ export function getOperations(data) {
           const groupName = operation.tags?.[0] || path.split('/')[1];
 
           if (!groups[groupName]) {
-            groups[groupName] = data.tags.find((t) => t.name === groupName) || {
+            groups[groupName] = data.tags?.find(
+              (t) => t.name === groupName,
+            ) || {
               name: groupName,
             };
             groups[groupName].operations = [];
