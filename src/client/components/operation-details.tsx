@@ -22,8 +22,8 @@ export function OperationDetails({ operation, definitions }) {
 
   return (
     <div>
-      <h2 className="text-2xl pb-4">{operation.id}</h2>
-      <p className="font-light pb-4">{operation.summary}</p>
+      <h2 className="text-2xl pb-4">{operation.summary}</h2>
+      <p className="font-light pb-4">{operation.description}</p>
 
       <div>
         <h4 className="py-4 border-b border-gray-200 font-medium">
